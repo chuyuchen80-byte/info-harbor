@@ -1,0 +1,14 @@
+# 价值评分权重（§4-⑦）：rule_score + LLM 四维分 → value_score(0-100)
+# 版本号用于追溯某条评分的权重口径；热加载需携带版本校验。
+version: 1
+
+# LLM 四维权重（各 0-1，合计 1.0）
+dimensions:
+  relevance: 0.30
+  timeliness: 0.20
+  impact: 0.30
+  credibility: 0.20
+
+# 规则初筛分与 LLM 综合分在最终 value_score 中的占比（MVP 阶段 LLM 占比为 0）
+rule_weight: 0.20
+llm_weight: 0.80

@@ -1,0 +1,21 @@
+# 规则初筛（§6.2）：关键词/黑白名单/正则，产出 rule_score(0-100)
+# 低于 threshold 的内容进审核队列而非直接丢弃（MVP 人工审核兜底）。
+version: 1
+threshold: 50
+
+rules:
+  - id: block_spam_keywords
+    type: keyword
+    action: reject
+    keywords: ["sponsored", "subscribe now", "advert"]
+
+  - id: boost_ai_core
+    type: keyword
+    action: boost
+    weight: 15
+    keywords: ["transformer", "foundation model", "agent", "LLM"]
+
+  - id: block_non_ai_topics
+    type: keyword
+    action: reject
+    keywords: ["recipes", "crypto price"]
