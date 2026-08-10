@@ -1,0 +1,26 @@
+# 处理管道拓扑（§6.2）：可插拔 Stage 流水线，新增处理步骤 = 写一个类 + 此处声明
+version: 1
+
+stages:
+  - name: clean
+    module: app.plugins.processors.clean
+    params: {}
+
+  - name: dedup
+    module: app.plugins.processors.dedup
+    params:
+      simhash_bits: 64
+      hamming_threshold: 4
+
+  - name: language
+    module: app.plugins.processors.language
+    params: {}
+
+  - name: translate
+    module: app.plugins.processors.translate
+    params:
+      target_lang: zh
+
+  - name: rule_screen
+    module: app.plugins.processors.rule_screen
+    params: {}
