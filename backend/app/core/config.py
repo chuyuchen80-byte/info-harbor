@@ -9,8 +9,8 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# backend/ 的上一级 = 仓库根
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# backend/app/core/config.py 往上 3 级 = 仓库根
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_DIR = PROJECT_ROOT / "config"
 
 
@@ -30,8 +30,15 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173"]
 
-    # 存储
-    database_url: str = "postgresql+asyncpg://harbor:harbor@localhost:5432/harbor"
+    # 日志
+    log_level: str = "INFO"
+    log_json: bool = False
+
+    # 数据源配置目录（config/sources/*.yaml，seed 引导用）
+    source_config_dir: str = str(CONFIG_DIR / "sources")
+
+    # 存储（本机 MySQL，用户 root/root，库 info_harbor）
+    database_url: str = "mysql+aiomysql://root:root@127.0.0.1:3306/info_harbor"
     redis_url: str = "redis://localhost:6379/0"
 
     # 任务

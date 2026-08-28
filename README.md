@@ -10,16 +10,15 @@
 ├── backend/     FastAPI 后端（六边形架构，按领域拆包）
 ├── frontend/    Vue3 前端（Vite + TS + Pinia + Naive UI）
 ├── config/      YAML 业务规则配置（评分权重 / 筛选规则 / 管道拓扑 / 数据源）
-└── docker-compose.yml   本地基础设施（PostgreSQL / Redis / MinIO）
+└── docker-compose.yml   本地基础设施编排（未来统一用 docker 启动 Redis / MinIO）
 ```
 
 ## 快速开始
 
-基础设施（PostgreSQL / Redis / MinIO）：
+- **数据库 / 缓存**：当前均用本机（MySQL 3306、Redis 6379，brew 安装）。详见 `backend/docs/DOCKER.md`。
+- **MinIO**：暂未配置，为原始快照预留。
 
-```bash
-docker compose up -d postgres redis minio
-```
+> MySQL 与 Redis 后续会统一改为 docker-compose 启动；过渡期以本机为主。
 
 - 后端：见 `backend/README.md`
 - 前端：见 `frontend/README.md`
