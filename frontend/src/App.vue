@@ -1,6 +1,21 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { NConfigProvider, NMessageProvider, zhCN } from 'naive-ui'
+
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+onMounted(() => {
+  authStore.init()
+})
+
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -15,8 +30,15 @@ import { NConfigProvider, NMessageProvider, zhCN } from 'naive-ui'
             <RouterLink to="/countries">国家/地区</RouterLink>
             <RouterLink to="/sources">来源</RouterLink>
             <RouterLink to="/search">搜索</RouterLink>
-            <RouterLink to="/admin">管理</RouterLink>
+            <RouterLink v-if="authStore.isAuthenticated" to="/admin">管理</RouterLink>
           </nav>
+          <div class="auth-actions">
+            <template v-if="authStore.isAuthenticated">
+              <span class="user-name">{{ authStore.user?.username }}</span>
+              <a href="#" class="logout" @click.prevent="handleLogout">退出</a>
+            </template>
+            <RouterLink v-else to="/login" class="login-link">登录</RouterLink>
+          </div>
         </header>
         <main class="layout-main">
           <RouterView />
@@ -70,6 +92,24 @@ body {
 .nav a.router-link-active {
   color: #165dff;
   font-weight: 600;
+}
+.auth-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+.user-name {
+  color: #1f2329;
+}
+.logout,
+.login-link {
+  color: #165dff;
+  text-decoration: none;
+}
+.logout {
+  color: #f53f3f;
 }
 .layout-main {
   flex: 1;

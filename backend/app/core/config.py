@@ -50,6 +50,22 @@ class Settings(BaseSettings):
     minio_secret_key: str = "harbor-secret"
     minio_bucket: str = "harbor-raw"
 
+    # 认证（JWT）：生产环境务必通过 .env 提供强随机 HARBOR_JWT_SECRET
+    jwt_secret: str = "dev-secret-change-me"
+    jwt_expire_minutes: int = 1440  # 24h
+
+    # 图形验证码
+    captcha_ttl_seconds: int = 300  # 5 分钟有效
+    captcha_length: int = 4
+
+    # 登录防爆破：同一账号 N 分钟内失败次数上限
+    login_max_failures: int = 5
+    login_fail_window_seconds: int = 300
+
+
+# JWT 签名算法（HS256）
+JWT_ALGORITHM = "HS256"
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -26,6 +26,16 @@
 ### D6 事件总线 in-process
 - MVP 单进程 EventBus；多 worker 后切 Redis Streams（只换实现）。
 
+### D7 认证：JWT（HS256）+ 密码 bcrypt + 图形验证码存 Redis
+- **决策**：登录用 PyJWT 签发 Bearer token（`HARBOR_JWT_EXPIRE_MINUTES`，默认 24h）；密码哈希用 pwdlib[bcrypt]（不用 passlib，其已停维护且与 bcrypt>=4.1 不兼容）；图形验证码用 Pillow 手绘 PNG，验证码存 Redis（`captcha:<uuid>`，TTL 300s，**一次性消费**——Lua 原子 GET+DEL）。
+- **影响**：新增 `auth` extras 依赖组（pyjwt / pwdlib[bcrypt] / redis / pillow / email-validator）；`.env` 需配置 `HARBOR_JWT_SECRET`。
+- **RBAC 预留**：`users.role` 字段 + JWT payload 带 `role` claim；后端 `require_roles()` 依赖工厂、前端 `meta.role` 均已预留，权限管理轮次接线。
+
+### D8 登录防爆破：5 次失败 / 5 分钟锁定
+- **决策**：同一账号（用户名或邮箱）在 Redis `login_fail:<account>` 计数，窗口 5 分钟；达到 5 次后返回 429，登录成功或窗口过期后重置。
+- **原因**：代价低（复用 Redis）、能挡住口令爆破；不引入验证码滑动等重交互。
+- **影响**：登录接口可能返回 429；验证码消费失败返回 400（不计数，防绕过）。
+
 ## 待决策
 
 - （爬虫阶段补充：RSS 解析用 feedparser / 抓取超时与重试策略 / 任务失败告警）

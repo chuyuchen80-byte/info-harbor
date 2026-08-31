@@ -46,6 +46,18 @@
 | error | TEXT | 失败原因 |
 | created_at / started_at / finished_at | DATETIME | 生命周期时间戳 |
 
+### users（用户，认证/权限）
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | VARCHAR(64) PK | uuid4().hex |
+| username | VARCHAR(64) 唯一 | 登录账号（2-64 字符） |
+| email | VARCHAR(200) 唯一 | 邮箱（登录也可用） |
+| password_hash | VARCHAR(255) | bcrypt 哈希，不存明文 |
+| role | VARCHAR(32) | user / admin（默认 user，RBAC 预留） |
+| status | VARCHAR(32) | active / disabled（默认 active） |
+| created_at / updated_at | DATETIME | 时间戳 |
+| last_login_at | DATETIME | 最近登录时间 |
+
 ## JSON 字段说明
 
 MySQL 8 用 `JSON` 类型（PostgreSQL 的 `JSONB` 等价替代）。`config` / `health` / `tags` / `entities` / `categories` / `ext_json` 均为 JSON。
@@ -59,4 +71,6 @@ alembic revision --autogenerate -m "描述"
 alembic upgrade head
 ```
 
-> 当前迁移：`3c9d2c1976b3`（sources / articles / crawl_tasks 初始表）。
+> 当前迁移：
+> - `3c9d2c1976b3`（sources / articles / crawl_tasks 初始表）
+> - `2941dfbc0d58`（users 表，认证/权限）

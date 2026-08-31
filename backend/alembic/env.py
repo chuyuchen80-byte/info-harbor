@@ -19,6 +19,7 @@ from app.core.db import Base
 import app.domain.articles.models  # noqa: F401
 import app.domain.sources.models  # noqa: F401
 import app.domain.tasks.models  # noqa: F401
+import app.domain.users.models  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)

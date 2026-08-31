@@ -1,6 +1,6 @@
 # 环境 / 基础设施
 
-> **唯一陈述：MySQL 与 Redis 当前走本机（brew），后续统一用 docker-compose 启动。**
+> **唯一陈述：MySQL 与 Redis 当前走本机（Windows 本机安装 + 下载版 Redis），后续统一用 docker-compose 启动。**
 > 本文档是环境描述的唯一事实来源，其他文档只引用此处，不再各写各的端口。
 
 ## 概念速记（学 docker 用）
@@ -13,12 +13,25 @@
 | port 端口映射 | 容器端口 ↔ 宿主机端口 | 接线板插孔 |
 | compose | 多容器编排文件 | 一键启动脚本 |
 
-## 当前：本地（brew）
+## 当前：本地
 
 | 服务 | 来源 | 端口 | 说明 |
 |------|------|------|------|
-| MySQL | 本机 brew | 3306 | 库 `info_harbor`，用户 `root/root` |
-| Redis | 本机 brew | 6379 | `brew services start redis` 即起 |
+| MySQL | 本机安装 | 3306 | 库 `info_harbor`，用户 `root/root` |
+| Redis | 下载解压版 7.4.11 | 6379 | 见下方「Redis（Windows）启动」；启动命令：`redis-server --port 6379` |
+
+## Redis（Windows）启动
+
+本机为 Windows 环境，Redis 用官方 Windows 移植版（redis-windows，7.4.11）解压到
+`D:\User\AppData\Local\Programs\redis\Redis-7.4.11-Windows-x64-msys2\`：
+
+```bash
+cd D:/User/AppData/Local/Programs/redis/Redis-7.4.11-Windows-x64-msys2
+./redis-server.exe --port 6379     # 启动
+./redis-cli.exe -p 6379 ping       # 验证 → PONG
+```
+
+> 登录验证码、登录防爆破计数均依赖 Redis；Redis 未启动时对应接口返回 503（fail-closed）。
 
 ## 未来：容器（docker-compose）
 
@@ -42,11 +55,10 @@
 ## 常用命令
 
 ```bash
-# 当前本地：起 MySQL（若未起）/ Redis
-brew services start mysql
-brew services start redis
+# 当前本地：起 MySQL（若未起）/ Redis（Windows）
+# MySQL：本机服务自启；Redis 见上方「Redis（Windows）启动」
 
-# 未来容器：起 Redis + MinIO（本机 brew 实例可先停）
+# 未来容器：起 Redis + MinIO（本机实例可先停）
 # docker compose up -d redis minio
 # docker ps            # 查看运行中的容器
 # docker logs harbor-redis

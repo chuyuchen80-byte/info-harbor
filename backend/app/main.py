@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.events import EventBus, register_domain_events
 from app.domain.articles.api.router import router as articles_router
+from app.domain.users.api.router import router as users_router
 
 settings = get_settings()
 
@@ -40,3 +41,4 @@ async def health() -> dict:
 
 # 按领域挂载（§10）：新增领域 = 新增 router + 一行 include_router
 app.include_router(articles_router, prefix=settings.api_prefix)
+app.include_router(users_router, prefix=settings.api_prefix)

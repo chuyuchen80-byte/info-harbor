@@ -18,19 +18,24 @@
 - `plugins/registry.py`：`SourcePlugin` 抽象类 + `Registry` 容器
 
 ### 已落地的真实文件（学习过程中创建）
-- `domain/{sources,articles,tasks}/models.py`：三域 ORM 模型（字段对齐契约）
-- alembic 脚手架 + `env.py`（async）+ 初始迁移 `3c9d2c1976b3`（sources/articles/crawl_tasks 三表，**已 upgrade 到本机 MySQL**）
+- `domain/{sources,articles,tasks,users}.models.py`：四域 ORM 模型（字段对齐契约）
+- alembic 脚手架 + `env.py`（async）+ 初始迁移 `3c9d2c1976b3`（sources/articles/crawl_tasks 三表，**已 upgrade 到本机 MySQL**）+ `2941dfbc0d58`（users 表，认证/权限）
+
+### 登录认证（新增，2026-08）
+- 完成：图形验证码 + 密码登录 + 注册，JWT（24h），验证码存 Redis（一次性、5 分钟 TTL），登录防爆破（5 次/5 分钟 → 429）
+- 完成：前端登录/注册页（Naive UI）+ 路由守卫（未登录跳 /login）+ 401 自动清理 token；`/admin` 等带 `meta.role` 的页面未登录跳登录页
+- RBAC 预留：`users.role`、JWT `role` claim、后端 `require_roles()`、前端 `meta.role`（权限管理轮次接线）
 
 ### 基础设施
-- 数据库：本机 MySQL（brew，`root/root`，库 `info_harbor`）
-- 缓存：本机 Redis（brew，6379）
+- 数据库：本机 MySQL（`root/root`，库 `info_harbor`）
+- 缓存：本机 Redis（**下载版 7.4.11**，`D:\User\AppData\Local\Programs\redis\Redis-7.4.11-Windows-x64-msys2\`，6379）
 - MinIO：预留，暂未接入（`articles.raw_snapshot_key` 字段已建，无读写客户端）
-- 依赖按 extras 分组：`crawler` / `storage` / `tasks` / `ai` / `dedup` / `dev`（已装到 `.venv`）
+- 依赖按 extras 分组：`crawler` / `storage` / `tasks` / `ai` / `dedup` / `auth` / `dev`（已装到 `.venv`）
 
 ## 环境（MySQL / Redis 当前走本地，后续统一 docker）
 
 - MySQL：本机 3306，`root/root`，库 `info_harbor`
-- Redis：本机 6379（brew）
+- Redis：本机 6379（下载版 Redis 7.4.11，见 `DOCKER.md`）
 - MinIO：预留，暂未接入
 - 曾用 PostgreSQL@5433，已切换为 MySQL（见 `DECISIONS.md` D1）
 
@@ -42,7 +47,8 @@
 ## 当前任务进度
 
 - [x] 装依赖、起本机 MySQL（info_harbor 库）+ 本机 Redis（6379）
-- [x] 创建 db.py / logging.py / 三域 ORM 模型 / alembic 初始迁移并建表（MySQL）
+- [x] 创建 db.py / logging.py / 四域 ORM 模型 / alembic 初始迁移并建表（MySQL）
+- [x] 登录认证：图形验证码 + 密码登录/注册 + JWT + 防爆破 + 前端登录页与路由守卫
 - [x] 建立 docs 体系（12 个文件，对齐 CMS）
 - [x] 学架构（ARCHITECTURE.md 已写，用户已理解请求链路/plugins 概念）
 - [ ] 学 docker（DOCKER.md 已建骨架，命令实操待练）

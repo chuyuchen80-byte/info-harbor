@@ -15,7 +15,14 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (res) => res,
   (err) => {
-    // TODO: 401 → 刷新 token；网络错误 → 重试
+    // 401 → 凭证失效：清理本地 token 并回登录页（避免与 auth store 循环依赖，直接操作 localStorage）
+    if (err.response?.status === 401) {
+      localStorage.removeItem('harbor_token')
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+    // TODO: 网络错误 → 重试
     return Promise.reject(err)
   },
 )

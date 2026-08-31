@@ -15,13 +15,62 @@
 
 ## 快速开始
 
-- **数据库 / 缓存**：当前均用本机（MySQL 3306、Redis 6379，brew 安装）。详见 `backend/docs/DOCKER.md`。
-- **MinIO**：暂未配置，为原始快照预留。
+> 前提：本机 MySQL（3306，root/root，库 `info_harbor`）与 Redis（6379）已运行。
+> 环境细节见 `backend/docs/DOCKER.md`。
 
-> MySQL 与 Redis 后续会统一改为 docker-compose 启动；过渡期以本机为主。
+### 1. 环境变量
 
-- 后端：见 `backend/README.md`
-- 前端：见 `frontend/README.md`
+复制 `.env.example` 为 `.env`（gitignored，不会提交），按需修改：
+`HARBOR_JWT_SECRET` 必须改为随机长字符串（生产必填）。
+
+### 2. 后端（FastAPI）
+
+依赖已装在 `backend/.venv`（含认证 `auth` extras），直接启动：
+
+**PowerShell（Windows）**
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+**Git Bash / macOS / Linux**
+
+```bash
+cd backend
+source .venv/Scripts/activate   # macOS/Linux 用 .venv/bin/activate
+uvicorn app.main:app --reload
+```
+
+数据库迁移（首次或改模型后）：
+
+```bash
+cd backend
+.venv/Scripts/alembic upgrade head
+```
+
+启动后验证：
+
+- 健康检查：<http://localhost:8000/health>
+- Swagger 文档：<http://localhost:8000/docs>（含认证接口）
+- 文章列表：<http://localhost:8000/api/v1/articles>
+
+### 3. 前端（Vue3 + Vite）
+
+```bash
+cd frontend
+npm run dev
+```
+
+启动后访问 <http://localhost:5173>，登录页在 <http://localhost:5173/login>（注册 → 登录 → 进入首页）。
+
+### 4. 基础设施（可选）
+
+PostgreSQL / MinIO 目前阶段非启动 API/前端的前置条件，需要时再起（Redis 已在本地运行）：
+
+```bash
+docker compose up -d redis minio
+```
 
 ## Git 协作约定
 
