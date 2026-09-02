@@ -28,8 +28,6 @@
 5. **[CURRENT_STATUS.md](CURRENT_STATUS.md)** — 当前进度
 6. **[DEVELOPER_PROFILE.md](DEVELOPER_PROFILE.md)** — 开发者画像（不提交，仅本地可读；事实以 CURRENT_STATUS.md 为准）
 
-学习期另加：本仓库作者在熟悉架构与 docker，讲解应逐层展开、多对照同步栈 CMS 的认知习惯。
-
 ---
 
 ## Plan 阶段要求
@@ -50,6 +48,32 @@
 | 修改数据库 | [DATABASE.md](DATABASE.md) |
 | 架构调整 | [DECISIONS.md](DECISIONS.md) |
 | 了解已知问题 | [TECH_DEBT.md](TECH_DEBT.md) |
+| 编写测试用例 | [DEVELOPMENT.md](DEVELOPMENT.md)（四、测试规范） |
+
+---
+
+## 测试工作流（必读）
+
+每次开发或修改接口，都需要测试用例：
+
+### 新接口
+1. 开发完接口后，等用户确认功能正常
+2. 用户确认后再编写测试用例
+3. 测试文件放在 `tests/` 目录，文件名 `test_<模块名>.py`
+
+### 修改接口
+1. 在原有测试文件中新增测试用例
+2. 新用例需说明与上一版的区别
+3. 保留原有测试用例，不删除
+
+### 测试用例格式
+```python
+def test_xxx_v2_new_behavior(client):
+    """测试新行为（v2 接口新增功能）。"""
+    # 原接口：返回 200
+    # 新接口：返回 201 并包含额外字段
+    ...
+```
 
 ---
 

@@ -3,16 +3,6 @@
 > **唯一陈述：MySQL 与 Redis 当前走本机（Windows 本机安装 + 下载版 Redis），后续统一用 docker-compose 启动。**
 > 本文档是环境描述的唯一事实来源，其他文档只引用此处，不再各写各的端口。
 
-## 概念速记（学 docker 用）
-
-| 概念 | 是什么 | 类比 |
-|------|--------|------|
-| image 镜像 | 模板，只读 | 安装包 |
-| container 容器 | 镜像的运行实例 | 正在跑的程序 |
-| volume 卷 | 容器外的持久化数据盘 | 硬盘 |
-| port 端口映射 | 容器端口 ↔ 宿主机端口 | 接线板插孔 |
-| compose | 多容器编排文件 | 一键启动脚本 |
-
 ## 当前：本地
 
 | 服务 | 来源 | 端口 | 说明 |
@@ -35,7 +25,7 @@ cd D:/User/AppData/Local/Programs/redis/Redis-7.4.11-Windows-x64-msys2
 
 ## 未来：容器（docker-compose）
 
-> 等学会 docker 后，统一用 `docker compose up` 编排，本机 brew 实例可停掉。
+> 后续统一用 `docker compose up` 编排，本机实例可停掉。
 
 | 服务 | 镜像 | 宿主机端口 | 说明 |
 |------|------|-----------|------|
@@ -66,5 +56,3 @@ cd D:/User/AppData/Local/Programs/redis/Redis-7.4.11-Windows-x64-msys2
 # docker compose down
 # docker ps --format '{{.Names}}\t{{.Ports}}'   # 查端口映射
 ```
-
-> 详细命令与心智模型在学习期由 DOCKER 学习笔记补充。

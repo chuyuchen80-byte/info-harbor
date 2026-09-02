@@ -4,7 +4,7 @@
 
 ## 阶段定位
 
-**早期骨架阶段 + 学习期**。架构骨架由朋友搭建完成，作者在熟悉架构、学习 docker 的过程中用 docs 当教材重建认知。爬虫管理系统（M1）尚未实现，先打基础。
+**早期骨架阶段**。架构骨架由朋友搭建完成，作者在熟悉架构的过程中用 docs 当教材重建认知。爬虫管理系统（M1）尚未实现，先打基础。
 
 ## 已完成（骨架）
 
@@ -17,7 +17,7 @@
 - `core/llm_gateway.py` / `core/dedup.py`：抽象层占位
 - `plugins/registry.py`：`SourcePlugin` 抽象类 + `Registry` 容器
 
-### 已落地的真实文件（学习过程中创建）
+### 已落地的真实文件
 - `domain/{sources,articles,tasks,users}.models.py`：四域 ORM 模型（字段对齐契约）
 - alembic 脚手架 + `env.py`（async）+ 初始迁移 `3c9d2c1976b3`（sources/articles/crawl_tasks 三表，**已 upgrade 到本机 MySQL**）+ `2941dfbc0d58`（users 表，认证/权限）
 
@@ -51,12 +51,10 @@
 - [x] 登录认证：图形验证码 + 密码登录/注册 + JWT + 防爆破 + 前端登录页与路由守卫
 - [x] 建立 docs 体系（12 个文件，对齐 CMS）
 - [x] 学架构（ARCHITECTURE.md 已写，用户已理解请求链路/plugins 概念）
-- [ ] 学 docker（DOCKER.md 已建骨架，命令实操待练）
 - [ ] 跑通系统：起 uvicorn + arq worker + 观察日志
-- [ ] 爬虫管理系统 M1（用户熟悉架构/学会 docker 后布置）
+- [ ] 爬虫管理系统 M1
 
 ## 下一步计划
 
-1. 练 docker 常用命令（ps/logs/exec/compose），完善 DOCKER.md
-2. 起 uvicorn + worker 跑通，写复盘
-3. 进入爬虫管理系统 M1
+1. 起 uvicorn + worker 跑通，写复盘
+2. 进入爬虫管理系统 M1
