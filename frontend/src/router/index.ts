@@ -7,10 +7,9 @@ const router = createRouter({
   routes,
 })
 
-// 页面级权限：meta.role 预留（§6.6）。
-// 当前规则：带 meta.role 且非 guest 的页面未登录 → 跳登录页。
-// TODO(RBAC)：拉取 /auth/me 后按 meta.role（如 'admin'）对比 store.user.role。
-router.beforeEach((to) => {
+// 页面级权限：/admin 需登录（meta.role=admin）且角色匹配才放行。
+// 角色以 authStore.user.role（/auth/me 实时拉取）为准；路由守卫 + 页面内兜底双保险。
+router.beforeEach(async (to) => {
   document.title = to.meta.title ? `${String(to.meta.title)} · info-harbor` : 'info-harbor'
 
   const token = localStorage.getItem('harbor_token')

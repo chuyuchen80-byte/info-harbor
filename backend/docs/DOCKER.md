@@ -1,27 +1,28 @@
 # 环境 / 基础设施
 
-> **唯一陈述：MySQL 与 Redis 当前走本机（Windows 本机安装 + 下载版 Redis），后续统一用 docker-compose 启动。**
-> 本文档是环境描述的唯一事实来源，其他文档只引用此处，不再各写各的端口。
+> **唯一陈述：项目依赖本机 MySQL（3306，库 `info_harbor`，`root/root`）与本机 Redis（6379），由各开发机自行安装启动；后续统一用 docker-compose 编排。**
+> 本文档只写「项目需要什么」；「你的机器怎么装、怎么启动」属于机器差异，写进各机器本地笔记
+> `docs/LOCAL_ENV_<机器名>.md`（gitignored，模板见 `LOCAL_ENV_TEMPLATE.md`），**不再写进公共文档**。
 
-## 当前：本地
+## 公共约定（所有机器一致）
 
-| 服务 | 来源 | 端口 | 说明 |
-|------|------|------|------|
-| MySQL | 本机安装 | 3306 | 库 `info_harbor`，用户 `root/root` |
-| Redis | 下载解压版 7.4.11 | 6379 | 见下方「Redis（Windows）启动」；启动命令：`redis-server --port 6379` |
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| MySQL | 3306 | 库 `info_harbor`，用户 `root/root`；连接串走 `.env` 的 `HARBOR_DATABASE_URL` |
+| Redis | 6379 | 登录验证码 + 防爆破计数依赖；未启动时对应接口返回 503（fail-closed） |
 
-## Redis（Windows）启动
+## 开发机与本地笔记
 
-本机为 Windows 环境，Redis 用官方 Windows 移植版（redis-windows，7.4.11）解压到
-`D:\User\AppData\Local\Programs\redis\Redis-7.4.11-Windows-x64-msys2\`：
+两台开发机协作（macOS / Windows）。安装路径、启动命令等机器差异各自记录：
 
-```bash
-cd D:/User/AppData/Local/Programs/redis/Redis-7.4.11-Windows-x64-msys2
-./redis-server.exe --port 6379     # 启动
-./redis-cli.exe -p 6379 ping       # 验证 → PONG
-```
+| 机器 | 本地笔记（gitignored） | 记什么 |
+|------|------------------------|--------|
+| 任意 | `docs/LOCAL_ENV_TEMPLATE.md` | **模板（入库）**，复制填写 |
+| macOS | `docs/LOCAL_ENV_MAC.md` | brew 服务管理、pyenv / venv 等 |
+| Windows | `docs/LOCAL_ENV_WINDOWS.md` | MySQL 安装包、下载版 Redis 7.4.11 的启动命令等 |
 
-> 登录验证码、登录防爆破计数均依赖 Redis；Redis 未启动时对应接口返回 503（fail-closed）。
+- 复制模板为 `LOCAL_ENV_<机器名>.md` 后填写即可，`.gitignore` 已忽略 `LOCAL_ENV_*.md`，不会提交。
+- **Windows 同学首次迁移**：旧版本文档里的 Redis 启动段落可在 git 历史找回（`git log -p backend/docs/DOCKER.md`），拷进你本地的笔记。
 
 ## 未来：容器（docker-compose）
 
@@ -39,20 +40,16 @@ cd D:/User/AppData/Local/Programs/redis/Redis-7.4.11-Windows-x64-msys2
 
 ## 端口演进说明
 
-- 本地 Redis 用 **6379**；docker 版 Redis 映射到 **6380**，以免与本机实例冲突。
+- 本地 Redis 各机器统一 **6379**；docker 版 Redis 映射到 **6380**，以免与本机实例冲突。
 - PostgreSQL 曾用 @5433，已随 D1 决策切到 MySQL，不再相关。
 
 ## 常用命令
 
 ```bash
-# 当前本地：起 MySQL（若未起）/ Redis（Windows）
-# MySQL：本机服务自启；Redis 见上方「Redis（Windows）启动」
+# 各机器 MySQL / Redis 的安装与启动方式 → 看你自己的 LOCAL_ENV_<机器名>.md
 
 # 未来容器：起 Redis + MinIO（本机实例可先停）
 # docker compose up -d redis minio
 # docker ps            # 查看运行中的容器
-# docker logs harbor-redis
-# docker exec -it harbor-redis sh
-# docker compose down
 # docker ps --format '{{.Names}}\t{{.Ports}}'   # 查端口映射
 ```

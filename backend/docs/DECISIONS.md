@@ -20,7 +20,7 @@
 - MVP 用 `articles.url` 唯一索引 + `ON CONFLICT DO NOTHING`；RedisBloom 语义去重推迟。
 
 ### D5 端口规划
-- Redis 当前本机 **6379**（brew）；未来 docker 版映射到 **6380**，以免与本机实例冲突。
+- 各开发机本机 Redis 统一 **6379**；未来 docker 版映射到 **6380**，以免与本机实例冲突。
 - 曾用 pg@5433，已随 D1 切到 MySQL，不再相关。
 
 ### D6 事件总线 in-process
@@ -36,6 +36,24 @@
 - **原因**：代价低（复用 Redis）、能挡住口令爆破；不引入验证码滑动等重交互。
 - **影响**：登录接口可能返回 429；验证码消费失败返回 400（不计数，防绕过）。
 
+### D9 环境文档去机器化：公共 docs 讲约定，机器差异进本地笔记
+- **决策**：两台开发机（macOS / Windows）协作。公共文档（`DOCKER.md` 等）只写「项目需要什么服务、什么端口、什么库」；安装路径 / 启动命令等机器差异写进各机器 gitignored 的 `backend/docs/LOCAL_ENV_<机器名>.md`，模板 `LOCAL_ENV_TEMPLATE.md` 入库供复制。
+- **原因**：此前 `DOCKER.md` 以 Windows 视角写成环境「唯一事实来源」，与 macOS 实际（brew）持续漂移——公共文档被某一台机器的环境事实污染。
+- **影响**：环境相关公共文档禁止再写入具体机器路径；Windows 机的 Redis 启动说明由本人迁入其本地笔记（可从 git 历史找回）；依赖权威源为 `backend/pyproject.toml` extras（`requirements.txt` 已删）。
+
+### D10 InfoQ JSON 适配器：源粒度 1 源 12 频道；正文从文章页提取
+- **决策**：首批源 = InfoQ 中文站（用户数据源规划）。`sources` 表建 **1 行**（id=infoq，country=CN），12 个频道放 `config.channels`，任务按源执行、插件内逐频道游标翻页。正文获取：`getDetail.content` **已不再直出**、`content_url` 签名链接 403（2026-09-03 实测）——改为抓文章页 HTML（`/article/<uuid>`）后 **trafilatura 提取正文**，失败回退 `ai_summary` / `article_summary`。
+- **接口事实**：列表 `POST /public/v1/article/getList`（body `{"type":1,"ptype":0,"size":20,"id":<频道ID>,"score":""}`，score 毫秒游标翻页）；详情 `POST /public/v1/article/getDetail`（author[].nickname / publish_time / ai_summary）。请求带 UA + Referer 头。
+- **影响**：`crawler` extras（trafilatura/tenacity）自本轮起真实使用；文章 `tags` 存频道名，`ext_json` 存 channel_id/aid。
+
+### D11 定时与重试：arq 原生 cron；httpx 10s + tenacity 共 3 次尝试
+- **决策**：定时调度用 **arq `cron_jobs`**（worker 进程内，`HARBOR_CRAWL_INTERVAL_HOURS` 默认 12h，unique=True 防重复入队）——替代原计划的 APScheduler（同进程再养一个调度器属过度设计；tasks extras 的 apscheduler 保留给未来复杂调度）。HTTP 层 httpx 超时 10s；tenacity `stop_after_attempt(3)` + 1s 间隔。首轮量控制：每频道前 2 页 × 20 条。
+- **影响**：worker 重写（`crawl_source` 真任务 + T8 修复接线 db1）；APScheduler 未引入运行时依赖。
+
+### D12 插件抽象 async 化 + RBAC 接线
+- **决策**：`SourcePlugin` 三方法改 async（网络 IO 与全异步栈一致，骨架期同步签名废弃）；sources/tasks 管理接口全部 `require_roles("admin")`（D7 兑现），文章接口公开；运维工具 `app/scripts/promote_admin.py` 创建/提升 admin。
+- **影响**：`registry.py` 签名变更；前端 `/admin` 路由守卫 + 页面内角色兜底。
+
 ## 待决策
 
-- （爬虫阶段补充：RSS 解析用 feedparser / 抓取超时与重试策略 / 任务失败告警）
+- （下轮补充：文章清洗/摘要 stage、评分接入、任务 retry/cancel、多源扩展）

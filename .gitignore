@@ -29,6 +29,11 @@ frontend/vite.config.d.ts
 .DS_Store
 Thumbs.db
 
+# ---- AI 工具本地数据 / 机器本地笔记 ----
+.zcode/
+LOCAL_ENV_*.md
+!LOCAL_ENV_TEMPLATE.md
+
 # ---- 日志 / 临时 ----
 *.log
 *.tmp

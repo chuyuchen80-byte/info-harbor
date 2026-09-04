@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     login_max_failures: int = 5
     login_fail_window_seconds: int = 300
 
+    # 爬虫定时：全量 enabled 源的定时抓取间隔（小时），worker 进程 arq cron 生效
+    crawl_interval_hours: int = 12
+
 
 # JWT 签名算法（HS256）
 JWT_ALGORITHM = "HS256"

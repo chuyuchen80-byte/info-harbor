@@ -1,0 +1,52 @@
+/* 全局主题变量：浅色（:root）/ 深色（html.dark）双套。
+   页面组件一律用 var(--*)，禁止再写死十六进制颜色。
+   naive-ui 组件的深色由 NConfigProvider :theme="darkTheme" 负责。 */
+
+:root {
+  --bg-page: #f5f6f8;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f7fa;
+  --bg-active: #e8f1ff;
+  --bg-soft: #f0f2f5;
+  --bg-stat: #f7f9fc;
+  --border: #eef0f3;
+  --border-strong: #e5e6eb;
+  --text-1: #1f2329;
+  --text-2: #4e5969;
+  --text-3: #909399;
+  --text-faint: #b0b3b8;
+  --brand: #165dff;
+  --brand-deep: #0b3fb3;
+  --brand-soft-border: #d7e3ff;
+  --brand-shadow: rgba(22, 93, 255, 0.08);
+  --danger: #f53f3f;
+  --danger-text: #c0392b;
+  --danger-soft: #fdf1f0;
+  --warn: #b25e09;
+}
+
+html.dark {
+  --bg-page: #101218;
+  --bg-card: #1a1f29;
+  --bg-hover: #232b3a;
+  --bg-active: #1d2f52;
+  --bg-soft: #262e3d;
+  --bg-stat: #202839;
+  --border: #2a3140;
+  --border-strong: #333c4d;
+  --text-1: #e5e9f0;
+  --text-2: #a8b3c5;
+  --text-3: #7d8799;
+  --text-faint: #5c6675;
+  --brand: #3d7eff;
+  --brand-deep: #1d5fe0;
+  --brand-soft-border: #2a3f6e;
+  --brand-shadow: rgba(0, 0, 0, 0.4);
+  --danger: #e05252;
+  --danger-text: #ff7b7b;
+  --danger-soft: #33211f;
+  --warn: #d99a4e;
+}
+
+:root { --info: #0ea5e9; --ok: #18a058; }
+html.dark { --info: #38bdf8; --ok: #4ade80; }

@@ -15,8 +15,9 @@
 
 ## 快速开始
 
-> 前提：本机 MySQL（3306，root/root，库 `info_harbor`）与 Redis（6379）已运行。
-> 环境细节见 `backend/docs/DOCKER.md`。
+> 前提：本机 MySQL（3306，`root/root`，库 `info_harbor`）与 Redis（6379）已运行。
+> 安装/启动方式因开发机而异：公共约定见 `backend/docs/DOCKER.md`；各机器细节记在各自 gitignored 的
+> `backend/docs/LOCAL_ENV_<机器名>.md`（模板见 `LOCAL_ENV_TEMPLATE.md`）。
 
 ### 1. 环境变量
 

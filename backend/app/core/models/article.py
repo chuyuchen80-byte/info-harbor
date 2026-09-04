@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Entity(BaseModel):
@@ -19,6 +19,8 @@ class Entity(BaseModel):
 
 class Article(BaseModel):
     """统一文章契约：从 raw 到 ready 的全链路状态（§7）。"""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: str
     source_id: str
@@ -46,6 +48,8 @@ class Article(BaseModel):
 class Source(BaseModel):
     """源注册表（§8 sources 表）。"""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     name: str
     country: str | None = None
@@ -55,6 +59,13 @@ class Source(BaseModel):
     weight: float = 1.0
     enabled: bool = True
     health: dict[str, Any] = Field(default_factory=dict)
+
+
+class SourceUpdate(BaseModel):
+    """源更新请求体（PATCH 部分更新：只改给出的字段）。"""
+
+    enabled: bool | None = None
+    weight: float | None = None
 
 
 class Score(BaseModel):

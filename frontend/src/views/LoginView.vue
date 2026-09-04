@@ -196,8 +196,8 @@ onMounted(loadCaptcha)
 .auth-card {
   width: 360px;
   padding: 28px 32px 20px;
-  background: #fff;
-  border: 1px solid #e5e6eb;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
 }
 .auth-title {
@@ -214,7 +214,7 @@ onMounted(loadCaptcha)
 .captcha-img {
   height: 34px;
   width: 92px;
-  border: 1px solid #e5e6eb;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   cursor: pointer;
   flex-shrink: 0;
@@ -222,11 +222,11 @@ onMounted(loadCaptcha)
 .auth-switch {
   margin-top: 16px;
   font-size: 13px;
-  color: #4e5969;
+  color: var(--text-2);
   text-align: center;
 }
 .auth-switch a {
-  color: #165dff;
+  color: var(--brand);
   text-decoration: none;
 }
 </style>
