@@ -13,4 +13,10 @@ export const articleRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/ArticleDetailView.vue'),
     meta: { title: '文章详情', role: 'guest' },
   },
+  {
+    path: '/read/:id',
+    name: 'article-read',
+    component: () => import('@/views/ArticleDetailView.vue'),
+    meta: { title: '文章详情', role: 'guest' },
+  },
 ]

@@ -24,7 +24,8 @@
 - [系统接口](#系统接口)
 - [认证接口](#认证接口)
 - [文章接口](#文章接口)
-- [规划中接口](#规划中接口)
+- [数据源接口（admin）](#数据源接口admin)
+- [任务接口（admin）](#任务接口admin)
 
 ---
 
@@ -235,23 +236,39 @@ Authorization: Bearer {access_token}
 |------|------|------|--------|------|
 | page | int | 否 | 1 | 页码 |
 | page_size | int | 否 | 20 | 每页数量 |
-| country | string | 否 | - | 国家/地区筛选 |
-| source_id | string | 否 | - | 数据源 ID 筛选 |
-| min_score | float | 否 | - | 最低评分筛选 |
-| sort | string | 否 | published_at | 排序字段 |
+| country | string | 否 | - | 国家/地区筛选（如 `CN`） |
+| source_id | string | 否 | - | 数据源 ID 筛选（如 `infoq`） |
+| sort | string | 否 | published_at | 排序字段（`published_at` / `created_at`），NULL 排最后 |
 
 **Response (200):**
 
 ```json
 {
-    "items": [],
-    "total": 0,
+    "items": [
+        {
+            "id": "hex32",
+            "source_id": "infoq",
+            "title": "文章标题",
+            "url": "https://www.infoq.cn/article/xxx",
+            "content": "正文（trafilatura 提取）",
+            "summary": "摘要",
+            "author": "作者昵称",
+            "published_at": "2026-09-02T04:00:01Z",
+            "detected_lang": "zh",
+            "country": "CN",
+            "source_type": "api",
+            "tags": ["AI & 大模型"],
+            "status": "raw",
+            "ext_json": {"channel_id": 31, "channel": "AI & 大模型", "infoq_aid": "390682"}
+        }
+    ],
+    "total": 100,
     "page": 1,
     "page_size": 20
 }
 ```
 
-> 当前为骨架实现，返回空集。
+> M1 起为真实数据（InfoQ 适配器写入）；`min_score` 筛选待评分管道（V2）后开放。
 
 ---
 
@@ -261,76 +278,69 @@ Authorization: Bearer {access_token}
 - **Path:** `/api/v1/articles/{article_id}`
 - **Auth:** 无
 
-**Path Params:**
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| article_id | string | 文章 ID |
-
-**Response (200):**
-
-```json
-{
-    "id": "article_id_xxx",
-    "title": "文章标题",
-    "content": "文章内容...",
-    "source_id": "source_id_xxx",
-    "published_at": "2026-08-31T10:00:00Z",
-    "score": 8.5,
-    "status": "published"
-}
-```
-
-> 当前为骨架实现，返回 TODO 占位。
+**Response (200):** Article 契约完整字段（含 entities / ext_json）。**404** 文章不存在。
 
 ---
 
-## 规划中接口
+## 数据源接口（admin）
 
-> 以下接口计划在爬虫系统 M1 阶段实现。
+> 全部要求 `Authorization: Bearer <token>` 且 `role=admin`，否则 401/403。
 
-### 数据源管理
+### 来源产出概况（公开）
 
-| 方法 | 路径 | 功能 | 状态 |
-|------|------|------|------|
-| GET | `/api/v1/sources` | 数据源列表 | 📋 规划中 |
-| POST | `/api/v1/sources` | 创建数据源 | 📋 规划中 |
-| GET | `/api/v1/sources/{id}` | 数据源详情 | 📋 规划中 |
-| PATCH | `/api/v1/sources/{id}` | 更新数据源 | 📋 规划中 |
-| DELETE | `/api/v1/sources/{id}` | 删除数据源 | 📋 规划中 |
-| POST | `/api/v1/sources/{id}/crawl` | 触发抓取 | 📋 规划中 |
+- **Method:** `GET` · **Path:** `/api/v1/sources/overview`
+- **Auth:** 无（来源页/国家页公开数据）
+- **Response (200):** `[{id, name, country, type, adapter_key, enabled, article_count, last_published_at}]`（按文章数倒序）
 
-### 任务管理
+### 数据源列表
 
-| 方法 | 路径 | 功能 | 状态 |
-|------|------|------|------|
-| GET | `/api/v1/tasks` | 任务列表 | 📋 规划中 |
-| GET | `/api/v1/tasks/{id}` | 任务详情 | 📋 规划中 |
-| POST | `/api/v1/tasks/{id}/retry` | 重试任务 | 📋 规划中 |
-| POST | `/api/v1/tasks/{id}/cancel` | 取消任务 | 📋 规划中 |
+- **Method:** `GET` · **Path:** `/api/v1/sources`
+- **Response (200):** `Source[]`（id / name / country / type / adapter_key / weight / enabled / health / config）
+
+### 数据源详情
+
+- **Method:** `GET` · **Path:** `/api/v1/sources/{source_id}` · **404** 不存在
+
+### 更新数据源（启停 / 权重）
+
+- **Method:** `PATCH` · **Path:** `/api/v1/sources/{source_id}`
+- **Body:** `{"enabled": true, "weight": 1.5}`（部分更新，只传要改的字段）
+- **Response (200):** 更新后的 Source
+
+### 触发抓取（手动）
+
+- **Method:** `POST` · **Path:** `/api/v1/sources/{source_id}/crawl`
+- **Response (202):** `TaskOut`（status=`queued`，含 arq_job_id）
+- 执行在 worker 进程；状态流转见任务接口
+
+---
+
+## 任务接口（admin）
+
+### 任务列表
+
+- **Method:** `GET` · **Path:** `/api/v1/tasks`
+- **Query:** `source_id` / `task_status`（queued|running|succeeded|failed）/ `page` / `page_size`
+- **Response (200):** `{"items": [TaskOut], "total": n, "page": 1, "page_size": 20}`，created_at 倒序
+
+### 任务详情
+
+- **Method:** `GET` · **Path:** `/api/v1/tasks/{task_id}` · **404** 不存在
+
+**TaskOut 字段：** id / source_id / status / task_type(manual|scheduled) / arq_job_id / result_count / error / created_at / started_at / finished_at
+
+> 任务状态以 DB 为权威：queued → running → succeeded | failed；单条失败不中断整源（错误摘要写入 error）。retry / cancel 留下轮。
 
 ---
 
 ## RBAC 权限说明
 
-> 当前已预留 RBAC 支持，尚未完全启用。
+| 角色 | 说明 | 本轮接线 |
+|------|------|----------|
+| user | 普通用户（默认） | 文章接口公开可读 |
+| admin | 管理员 | sources / tasks 全部接口 |
 
-| 角色 | 说明 |
-|------|------|
-| user | 普通用户（默认） |
-| admin | 管理员 |
-
-**已实现的权限控制：**
-- `deps.py` 中的 `require_roles(*roles)` 依赖工厂已就绪
-- JWT payload 携带 `role` claim
-- 前端路由 `meta.role` 已预留
-
-**使用示例：**
-```python
-@router.get("/admin/dashboard")
-async def admin_dashboard(user = Depends(require_roles("admin"))):
-    ...
-```
+**运维工具：** `.venv/bin/python -m app.scripts.promote_admin <username> [--password <pw>]` —— 创建/提升 admin，可打印调试 token（`--no-token` 关闭）。
 
 ---
 

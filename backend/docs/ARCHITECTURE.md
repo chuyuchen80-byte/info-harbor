@@ -43,7 +43,13 @@ raw → cleaned → translated → screened → scored → ready
 
 ## 领域划分
 
-`domain/` 下六域：`articles` / `sources` / `screening` / `stats` / `tasks` / `users`。每域同构三层：`api / service / repository`。目前仅 articles 有占位端点，sources/tasks 的 models 已建（爬虫阶段落地）。
+`domain/` 下六域：`articles` / `sources` / `screening` / `stats` / `tasks` / `users`。每域同构三层：`api / service / repository`。M1（爬虫系统）后：users（认证）/ articles（真实列表详情）/ sources（CRUD+触发）/ tasks（任务监控）四域落地；screening / stats 仍为骨架。
+
+## 插件落地（M1）
+
+- `SourcePlugin` 抽象已 async 化（list_items / fetch_detail / normalize，输入 `Source` 契约）
+- 首个实现：`plugins/sources/infoq.py`（InfoQ JSON 接口，12 频道，见 DECISIONS D10）
+- 登记：`plugins/sources/__init__.py` 进程内单例 registry；worker 按 `source.adapter_key` 取用
 
 ## 与 CMS 的关键差异
 

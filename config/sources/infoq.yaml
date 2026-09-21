@@ -1,0 +1,27 @@
+# 首批数据源 seed（D2：YAML 引导 → lifespan 幂等 upsert 进 DB）。
+# 内容仅公开接口事实（站点/频道ID/接口参数）；完整采集规划见用户本地数据源文档（涉密不入库）。
+sources:
+  - id: infoq
+    name: InfoQ 中文站
+    country: CN
+    type: api
+    adapter_key: infoq
+    weight: 1.0
+    enabled: true
+    config:
+      base_url: https://www.infoq.cn
+      max_pages_per_channel: 2
+      page_size: 20
+      channels:
+        - { channel_id: 31, name: AI & 大模型, alias: ai }
+        - { channel_id: 147, name: 企业动态, alias: enterprise }
+        - { channel_id: 1168, name: 行业深度, alias: industry }
+        - { channel_id: 1207, name: 出海, alias: going-global }
+        - { channel_id: 1174, name: 后端, alias: backend }
+        - { channel_id: 1187, name: 芯片 & 算力, alias: chips }
+        - { channel_id: 8, name: 架构, alias: architecture }
+        - { channel_id: 15, name: 大数据, alias: bigdata }
+        - { channel_id: 1195, name: 软件工程, alias: software-eng }
+        - { channel_id: 11, name: 云计算, alias: cloud }
+        - { channel_id: 1208, name: 大前端, alias: web-fe }
+        - { channel_id: 1204, name: 管理 & 文化, alias: management }
