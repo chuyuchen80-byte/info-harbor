@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
 import { NTag } from 'naive-ui'
 
 import type { Article } from '@/types/article'
@@ -17,8 +16,10 @@ const sourceNames: Record<string, string> = {
 </script>
 
 <template>
-  <RouterLink
-    :to="`/articles/${article.id}`"
+  <a
+    :href="`/read/${article.id}`"
+    target="_blank"
+    rel="noopener"
     class="article-card"
     :class="{ 'is-new': highlight }"
   >
@@ -42,7 +43,7 @@ const sourceNames: Record<string, string> = {
         </NTag>
       </div>
     </div>
-  </RouterLink>
+  </a>
 </template>
 
 <style scoped>

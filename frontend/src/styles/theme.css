@@ -50,3 +50,13 @@ html.dark {
 
 :root { --info: #0ea5e9; --ok: #18a058; }
 html.dark { --info: #38bdf8; --ok: #4ade80; }
+
+/* 全局亮度遮罩（纯前端叠加，不改 CSS 变量）；默认 50%，由 themeStore 覆盖。 */
+:root { --brightness: 0.5; }
+.brightness-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(0, 0, 0, calc((0.5 - var(--brightness)) * 0.5));
+}

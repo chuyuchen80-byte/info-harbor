@@ -13,6 +13,15 @@ const articleStore = useArticleStore()
 const article = ref<Article | null>(null)
 const loading = ref(true)
 
+/** 全屏阅读模式：新 tab 打开 /read/:id（无导航胶囊），非全屏为嵌入模式。 */
+const isFullscreen = route.name === 'article-read'
+
+function close() {
+  window.close()
+  // 浏览器策略拒绝 close 时（非脚本打开的窗口）回退到历史。
+  if (window.history.length > 1) window.history.back()
+}
+
 /** 正文分段：trafilatura 提取的纯文本按空行分段渲染。 */
 function paragraphs(content: string | null | undefined): string[] {
   if (!content) return []
@@ -45,7 +54,12 @@ onMounted(async () => {
         <div class="detail-grid">
           <div class="col-main">
             <NCard :bordered="false" class="head-card">
-              <h1 class="detail-title">{{ article.title }}</h1>
+              <div class="head-row">
+                <h1 class="detail-title">{{ article.title }}</h1>
+                <button v-if="isFullscreen" class="close-btn" type="button" title="关闭" @click="close">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                </button>
+              </div>
               <div class="detail-meta">
                 <NTag v-if="article.country" size="small" :bordered="false">
                   {{ article.country }}
@@ -114,13 +128,37 @@ onMounted(async () => {
   min-height: 300px;
 }
 .empty-block { padding: 80px 0; }
+.close-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 16px;
   align-items: start;
 }
-.col-main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.col-main { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 .col-side { display: flex; flex-direction: column; gap: 16px; }
 .head-card, .body-card, .side-card { border-radius: 12px; }
 .detail-title {

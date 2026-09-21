@@ -109,16 +109,18 @@ onMounted(async () => {
               <NSpin :show="loading">
                 <NEmpty v-if="!loading && countryArticles.length === 0" description="暂无文章" />
                 <div v-else class="hot-list">
-                  <RouterLink
+                  <a
                     v-for="(a, i) in countryArticles.slice(0, 8)"
                     :key="a.id"
-                    :to="`/articles/${a.id}`"
+                    :href="`/read/${a.id}`"
+                    target="_blank"
+                    rel="noopener"
                     class="hot-item"
                   >
                     <span class="hot-rank" :class="{ top: i < 3 }">{{ i + 1 }}</span>
                     <span class="hot-title">{{ a.title }}</span>
                     <span class="hot-time">{{ timeAgo(a.published_at) }}</span>
-                  </RouterLink>
+                  </a>
                 </div>
               </NSpin>
             </NCard>

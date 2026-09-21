@@ -2,8 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { NButton, NCard, NEmpty, NGrid, NGridItem, NSpin, NStatistic, NTag } from 'naive-ui'
-
 import ArticleCard from '@/components/ArticleCard.vue'
+import HomeCarousel from '@/components/HomeCarousel.vue'
 import { heatColor } from '@/components/WorldHeat'
 import { useArticleStore } from '@/stores/article'
 import type { Article } from '@/types/article'
@@ -53,6 +53,8 @@ onMounted(async () => {
 
 <template>
   <div class="dashboard">
+    <HomeCarousel :items="latest.slice(0, 5)" />
+
     <NGrid :cols="4" :x-gap="16" :y-gap="16" responsive="screen">
       <NGridItem>
         <NCard class="metric-card">
@@ -119,27 +121,31 @@ onMounted(async () => {
       <NCard title="最近发布 TOP 8" class="col-main">
         <NEmpty v-if="latest.length === 0" description="暂无数据" />
         <div v-else class="top-list">
-          <RouterLink
+          <a
             v-for="(a, i) in latest.slice(0, 8)"
             :key="a.id"
-            :to="`/articles/${a.id}`"
+            :href="`/read/${a.id}`"
+            target="_blank"
+            rel="noopener"
             class="top-item"
           >
             <span class="top-rank" :class="{ top: i < 3 }">{{ i + 1 }}</span>
             <span class="top-title">{{ a.title }}</span>
             <NTag size="small" :bordered="false" class="top-tag">{{ a.country ?? '—' }}</NTag>
             <span class="top-time">{{ timeAgo(a.published_at) }}</span>
-          </RouterLink>
+          </a>
         </div>
       </NCard>
 
       <NCard title="精选速览" class="col-side">
         <NEmpty v-if="latest.length === 0" description="暂无数据" />
         <div v-else class="featured">
-          <RouterLink
+          <a
             v-for="a in latest.slice(0, 3)"
             :key="a.id"
-            :to="`/articles/${a.id}`"
+            :href="`/read/${a.id}`"
+            target="_blank"
+            rel="noopener"
             class="featured-item"
           >
             <span class="featured-badge">NEW</span>
@@ -147,7 +153,7 @@ onMounted(async () => {
             <span class="featured-meta">
               {{ a.author ?? a.source_id }} · {{ timeAgo(a.published_at) }}
             </span>
-          </RouterLink>
+          </a>
         </div>
       </NCard>
     </div>
@@ -159,6 +165,22 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.carousel-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.carousel-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.carousel-tag {
+  font-size: 12px;
+  color: var(--text-3);
+  padding-left: 4px;
+  letter-spacing: 0.06em;
 }
 .metric-card :deep(.n-card__content) {
   padding: 20px;

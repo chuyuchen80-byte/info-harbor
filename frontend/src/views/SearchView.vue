@@ -91,15 +91,17 @@ onMounted(async () => {
       />
       <NEmpty v-else-if="results.length === 0" :description="`没有包含「${keyword}」的结果`" />
       <div v-else class="result-list">
-        <RouterLink
+        <a
           v-for="a in results"
           :key="a.id"
-          :to="`/articles/${a.id}`"
+          :href="`/read/${a.id}`"
+          target="_blank"
+          rel="noopener"
           class="result-item"
         >
           <span class="result-title-text">{{ a.title }}</span>
           <span class="result-meta">{{ a.source_id }} · {{ timeAgo(a.published_at) }}</span>
-        </RouterLink>
+        </a>
       </div>
     </NCard>
   </div>
